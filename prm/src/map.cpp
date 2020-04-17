@@ -113,7 +113,7 @@ std::vector< std::vector<int> > Map::get_all_shapes(){
     vector< vector<int> > all_shapes;
     for (auto& vertex_id_pair:this->vertex_list){
         vector<int> shape;
-        this->add_next_vertices(vertex_id_pair.second.id, shape, vertex_id_pair.second.id);   //TODO
+        this->add_next_vertices(vertex_id_pair.second.id, shape, vertex_id_pair.second.id);
         if (shape.size()!=1){
             all_shapes.push_back(shape);
         }

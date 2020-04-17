@@ -1,0 +1,8 @@
+<launch>
+    <!--    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_description)/config/view_robot.rviz" required="true"/>-->
+        <node name="rviz" pkg="rviz" type="rviz" args="-d $(find prm)/config/visualize_prm.rviz" required="true"/>
+        <node name="prm_node" pkg="prm" type="prm_node" output="screen">
+            <rosparam file="$(find prm)/config/params.yaml" command="load"/>
+        </node>
+    <node pkg="tf" type="static_transform_publisher" name="static_map_frame" args="0 0 0 0 0 0 1 map 100" />
+</launch>

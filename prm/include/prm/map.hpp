@@ -8,6 +8,7 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
+#include <map>
 #include "rigid2d.hpp"
 
 struct Edge{
@@ -20,7 +21,7 @@ struct Edge{
 struct Vertex{
     int id;
     rigid2d::Vector2D coord;        //2D coordinate
-    std::unordered_map<int, Edge> edge_list;     // adjacent nodes
+    std::map<int, Edge> edge_list;     // adjacent nodes
     bool visited;                   // if the node has been visited during traversal
 
     Vertex(): id(-1), visited(false){}
@@ -77,6 +78,7 @@ public:
     std::vector< std::vector<int> > get_all_unique_edges() ;
 
     std::unordered_map<int, Vertex> vertex_list;            // list of vertices, with their id the Vertex
+
 private:
     int next_vertex_id;                                        // the id for the vertex to be added. this only increases so the id of each vertex is unique.
 
