@@ -9,7 +9,7 @@ Due to the robot size, the nodes should be far from obstacles.
  An implementation is shown below. The obstacles are marked in red, free paths are in blue, 
  and nodes are in yellow. 
  
- <img src="https://user-images.githubusercontent.com/39393023/79603616-4d70e600-80b2-11ea-9e8d-437f16d4b359.png" alt="Kitten" title="A cute kitten" width="400" />
+ <img src="https://user-images.githubusercontent.com/39393023/79608851-4dc1af00-80bb-11ea-80ac-ce465d7ddabb.png" alt="Kitten" title="A cute kitten" width="400" />
                                                                                                                                                
 ### Usage
 To run the PRM package, do

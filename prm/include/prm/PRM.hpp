@@ -43,7 +43,7 @@ public:
     void add_free_vertices(double bounding_r, int sample_size, const std::vector<double>& map_x_lims, const std::vector<double>& map_y_lims, double cell_size);
 
     /// \brief: identify K neighbours for each vertex and add edges between them.
-    void add_edges_to_N_neighbors(int K);
+    void add_edges_to_N_neighbors(int K, double bounding_r);
 
     /// \brief: return all free vertices
     /// \return: free vertex list
@@ -86,6 +86,11 @@ private:
     /// \param: vertex P
     /// \return: true if P is too close to an obstacle. Else false.
     bool if_too_close(const Vertex& P, double bounding_r) const;
+
+    /// \brief: check if an edge between two free vertices is too close to any obstacles
+    /// \param: two free vertices
+    /// \return: true if not close, else false.
+    bool if_edge_too_close_to_obstacle(const Vertex& V1, const Vertex& V2, double bounding_r) const;
 
 };
 #endif //PRM_PRM_H

@@ -118,7 +118,7 @@ int main(int argc, char** argv){
     PRM prm;
     prm.add_obstacles_and_normal_vecs(obstacle_list, cell_size*2);
     prm.add_free_vertices(robot_radius, sample_size, map_x_lims, map_y_lims, cell_size*2);
-    prm.add_edges_to_N_neighbors(k_nearest);
+    prm.add_edges_to_N_neighbors(k_nearest, robot_radius);
 
     auto vertex_list = prm.get_free_map_vertices();
     auto edge_list = prm.get_free_edges();

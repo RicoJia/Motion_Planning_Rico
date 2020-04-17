@@ -77,7 +77,7 @@ void PRM::add_free_vertices(double bounding_r, int sample_size, const std::vecto
     }
 }
 
-void PRM::add_edges_to_N_neighbors(int K){
+void PRM::add_edges_to_N_neighbors(int K, double bounding_r){
     auto& vertex_list = this->free_node_map.vertex_list;
     // traversing through all vertex combinations. n*(n-1)/2
 
@@ -89,18 +89,18 @@ void PRM::add_edges_to_N_neighbors(int K){
                 [&](std::pair<int, Vertex> pair_1, std::pair<int, Vertex> pair_2) -> bool{
                     return rigid2d::distance(pair_1.second.coord, current_vertex.coord) < rigid2d::distance(pair_2.second.coord, current_vertex.coord);
                     });
-
         for (auto neighbor_vertex_pair: unexplored_node_list){
             auto& neighbor_vertex = neighbor_vertex_pair.second;
             if (current_vertex.edge_list.size() >= K || neighbor_vertex.edge_list.size() >= K){
                 break;
             }
             if(!this->if_edge_collide(current_vertex, neighbor_vertex)){
-                this->free_node_map.insertEdge(current_vertex.id, neighbor_vertex.id);
+                if(!this->if_edge_too_close_to_obstacle(current_vertex, neighbor_vertex, bounding_r)){
+                    this->free_node_map.insertEdge(current_vertex.id, neighbor_vertex.id);
+                }
             }
         }
     }
-    free_node_map.printGraph(1);
 }
 
 std::unordered_map<int, Vertex> PRM::get_free_map_vertices(){
@@ -167,7 +167,6 @@ bool PRM::if_in_obstacle(const Vertex& P) const {
         }
     }
 
-
     return false;
 }
 
@@ -192,6 +191,29 @@ bool PRM::if_too_close(const Vertex &P, double bounding_r) const {
                 }
             }
 
+            if (rigid2d::length(V1P) <= bounding_r || rigid2d::length(V2P) <= bounding_r){
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool PRM::if_edge_too_close_to_obstacle(const Vertex &V1, const Vertex &V2, double bounding_r) const {
+    for (auto& obstacle_indices: this->obstacles_indices_list){
+        for (int obstacle_index: obstacle_indices){
+            auto P = this->obstacle_map.vertex_list.at(obstacle_index);
+            Vector2D V1P = P.coord - V1.coord;
+            Vector2D V1V2 = V2.coord - V1.coord;
+            Vector2D V2P = P.coord - V2.coord;
+            double u = V1P * V1V2/(V1V2 * V1V2);
+            if (0<=u && u<= 1){
+                auto V = V1.coord + u * V1V2;
+                double shortest_dist = rigid2d::distance(V, P.coord);
+                if (shortest_dist <= bounding_r){
+                    return true;
+                }
+            }
             if (rigid2d::length(V1P) <= bounding_r || rigid2d::length(V2P) <= bounding_r){
                 return true;
             }
