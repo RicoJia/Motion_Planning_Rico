@@ -34,3 +34,11 @@ void GridMap::add_free_vertices(double bounding_r,
 std::vector<int> GridMap::get_data() const {
     return this->data;
 }
+
+std::vector<double> GridMap::get_x_y(int data_index) const{
+    int row_num = data_index/width;
+    int cln_num = data_index - row_num * width;
+    double x = (row_num + 0.5) * this->resolution;
+    double y = (cln_num + 0.5) * this->resolution;
+    return std::vector<double>{x, y};
+}

@@ -1,4 +1,6 @@
 /// \brief: the grid mapping node that calculates the 1. occupancy 2. buffer area 3. free space of a map
+/// PUBLISHES: /map (nav_msgs/OccupancyGrid) the grid world map
+
 #include <ros/ros.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include "../include/prm/grid_map.hpp"
@@ -39,13 +41,14 @@ int main(int argc, char** argv ){
     grid_msg.info.height = (map_y_lims.at(1) - map_y_lims.at(0));
 
     double safety_distance = robot_radius + cell_size/sqrt(2);
-    GridMap grid_map(grid_msg.info.width, grid_msg.info.height);
+    GridMap grid_map(grid_msg.info.width, grid_msg.info.height, cell_size);
     grid_map.add_obstacles_and_normal_vecs(obstacle_list, cell_size);
     grid_map.add_free_vertices(safety_distance, sample_size, map_x_lims, map_y_lims, cell_size);
     grid_map.add_edges_to_N_neighbors(k_nearest,safety_distance);
 
     populate_grid_msg(grid_msg, grid_msg.info.height, grid_msg.info.width, grid_map);
     grid_pub.publish(grid_msg);
+
     ros::spin();
     return 0;
 }
