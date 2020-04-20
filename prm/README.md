@@ -13,7 +13,8 @@ An implementation of the PRM is shown below. The obstacles are marked in red, fr
 
  <img src="https://user-images.githubusercontent.com/39393023/79608851-4dc1af00-80bb-11ea-80ac-ce465d7ddabb.png" alt="Kitten" title="A cute kitten" width="400" />
 -  
-The grid map is the following: 
+The grid map is the following, light grey areas are free spaces, dark grey areas are buffer zones where the robot might hit an obstacle, 
+black zones are obstacles.   
  <img src="https://user-images.githubusercontent.com/39393023/79704567-ab9af600-8277-11ea-81d2-f29b19eb05c2.png" alt="Kitten" title="A cute kitten" width="400" />
 
                                                                                                                                                
