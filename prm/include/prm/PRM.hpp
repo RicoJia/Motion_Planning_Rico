@@ -11,7 +11,9 @@
 /// Lessons Learned:
 ///     1. fully understand the math first. My edge collision and occupancy algorithms did not work.
 ///     2. Be careful with names in params.yaml.
-///     3.
+///     3. The search algorithm for map does not return a counter-clockwise cycle. Therefore even though it returns a closed shape, this cannot be used for counter-clockwise shape determination
+///     4. tolerance is necessary, as numerical error is inevitable.
+///     5. I had deep bugs in my rigid2d code!!!
 
 #include <memory>
 #include "map.hpp"
@@ -40,7 +42,7 @@ public:
     void add_obstacles_and_normal_vecs(XmlRpc::XmlRpcValue& obstacle_list, double coord_multiplier);
 
     /// \brief sample and add free vertices to free_node_map.
-    void add_free_vertices(double bounding_r, int sample_size, const std::vector<double>& map_x_lims, const std::vector<double>& map_y_lims, double cell_size);
+    virtual void add_free_vertices(double bounding_r, int sample_size, const std::vector<double>& map_x_lims, const std::vector<double>& map_y_lims, double cell_size);
 
     /// \brief: identify K neighbours for each vertex and add edges between them.
     void add_edges_to_N_neighbors(int K, double bounding_r);
@@ -67,7 +69,7 @@ public:
     bool if_edge_collide(const Vertex& A, const Vertex& B) const;
 
     //----------------------------------Public interface of PRM--------------------------------
-private:
+protected:
     /// \brief: private data hiding technique called pimpl idiom.
     struct impl;
     std::unique_ptr<impl> pimpl;

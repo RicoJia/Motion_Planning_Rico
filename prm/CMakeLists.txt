@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
         visualization_msgs
         geometry_msgs
+        nav_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -107,7 +108,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES prm
-  CATKIN_DEPENDS roscpp visualization_msgs geometry_msgs
+  CATKIN_DEPENDS roscpp visualization_msgs geometry_msgs nav_msgs
 #  DEPENDS system_lib
 )
 
@@ -127,6 +128,7 @@ add_library(${PROJECT_NAME}
    src/PRM.cpp
      src/map.cpp
      src/rigid2d.cpp
+        src/grid_map.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -143,6 +145,11 @@ target_link_libraries(${PROJECT_NAME}
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_node src/prm_node.cpp)
 target_link_libraries(${PROJECT_NAME}_node
+        ${catkin_LIBRARIES}
+        ${PROJECT_NAME}
+        )
+add_executable(grid_map_node src/grid_map_node.cpp)
+target_link_libraries(grid_map_node
         ${catkin_LIBRARIES}
         ${PROJECT_NAME}
         )
@@ -175,7 +182,7 @@ target_link_libraries(${PROJECT_NAME}_node
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
- install(TARGETS ${PROJECT_NAME}_node
+ install(TARGETS ${PROJECT_NAME}_node grid_map_node
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 

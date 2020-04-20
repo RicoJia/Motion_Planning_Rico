@@ -1,6 +1,7 @@
 
 #include "../include/prm/PRM.hpp"
 
+
 using std::cout;
 using std::cin;
 using std::endl; 
@@ -27,11 +28,11 @@ PRM::~PRM() = default;
 
 void PRM::add_obstacles_and_normal_vecs( XmlRpc::XmlRpcValue& obstacle_list, double coord_multiplier) {
 
-    for (unsigned int i=0; i<obstacle_list.size(); ++i) {
+    for (int i=0; i<obstacle_list.size(); ++i) {
         int last_vertex_id = -1;
         //get into a shape.
         std::vector<int> obstacle_vertices;
-        for (unsigned int j = 0; j < obstacle_list[i].size(); ++j) {
+        for (int j = 0; j < obstacle_list[i].size(); ++j) {
             int vertex_id = obstacle_map.insertVertex(double(obstacle_list[i][j][0])*coord_multiplier, double(obstacle_list[i][j][1])*coord_multiplier);
             if ( last_vertex_id!= -1){
                 obstacle_map.insertEdge(vertex_id, last_vertex_id);
@@ -52,7 +53,6 @@ void PRM::add_obstacles_and_normal_vecs( XmlRpc::XmlRpcValue& obstacle_list, dou
             if ( last_vertex_id!= -1){
                 Vector2D edge_vec = obstacle_map.vertex_list[vertex_id].coord - obstacle_map.vertex_list[last_vertex_id].coord;
                 Vector2D normal_vec( edge_vec.y, -1.0* edge_vec.x);
-                normal_vec.normalize_vec();
                 normal_vecs.push_back(normal_vec);
             }
             last_vertex_id = vertex_id;
@@ -65,7 +65,7 @@ void PRM::add_free_vertices(double bounding_r, int sample_size, const std::vecto
                             double cell_size){
     std::uniform_real_distribution<> x_gen(map_x_lims.at(0) * cell_size, map_x_lims.at(1)*cell_size);
     std::uniform_real_distribution<> y_gen(map_y_lims.at(0)* cell_size, map_y_lims.at(1)* cell_size);
-    for (unsigned int i = 0; i<sample_size; ++i){
+    for (int i = 0; i<sample_size; ++i){
         double x = x_gen(get_random());
         double y = y_gen(get_random());
         Vertex vertex(x,y);
@@ -138,9 +138,11 @@ bool PRM::if_in_obstacle(const Vertex& P) const {
         auto& obstacle_indices = obstacles_indices_list.at(j);//one obstacle shape
         for (unsigned int i = 0; i<obstacle_indices.size()-1; ++i){
             auto current_vertex = this->obstacle_map.vertex_list.at(obstacle_indices.at(i));
+            auto next_vertex = this->obstacle_map.vertex_list.at(obstacle_indices.at(i+1));
             Vector2D normal_vec = this->normal_vecs_list.at(j).at(i);
             Vector2D AP = P.coord - current_vertex.coord;
-            if (AP*normal_vec >0){
+            Vector2D AB = next_vertex.coord - current_vertex.coord;
+            if (AP.x*AB.y - AP.y*AB.x>1e-5){
                 break;
             }
             if (i == obstacle_indices.size()-2){
@@ -148,25 +150,6 @@ bool PRM::if_in_obstacle(const Vertex& P) const {
             }
         }
     }
-
-    double x = P.coord.x; double y = P.coord.y;
-    if(0<=x && x<=5.8 && 6.4<=y && y<=7.2){
-        for (unsigned int j = 0; j < this->obstacles_indices_list.size(); ++j){
-            auto& obstacle_indices = obstacles_indices_list.at(j);//one obstacle shape
-            for (unsigned int i = 0; i<obstacle_indices.size()-1; ++i){
-                auto current_vertex = this->obstacle_map.vertex_list.at(obstacle_indices.at(i));
-                Vector2D normal_vec = this->normal_vecs_list.at(j).at(i);
-                Vector2D AP = P.coord - current_vertex.coord;
-                if (AP*normal_vec >0){
-                    break;
-                }
-                if (i == obstacle_indices.size()-2){
-                    return true;
-                }
-            }
-        }
-    }
-
     return false;
 }
 
@@ -198,6 +181,7 @@ bool PRM::if_too_close(const Vertex &P, double bounding_r) const {
     }
     return false;
 }
+
 
 bool PRM::if_edge_too_close_to_obstacle(const Vertex &V1, const Vertex &V2, double bounding_r) const {
     for (auto& obstacle_indices: this->obstacles_indices_list){

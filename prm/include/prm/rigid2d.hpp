@@ -92,8 +92,11 @@ namespace rigid2d
         Vector2D():x(0.0), y(0.0){}
         /// \brief Normalize this vector
         void normalize_vec(){
-            x = x/pow((x*x+y*y),0.5);
-            y = y/pow((x*x+y*y),0.5);
+            double temp_x, temp_y;
+            temp_x = x/pow((x*x+y*y),0.5);
+            temp_y = y/pow((x*x+y*y),0.5);
+            x = temp_x;
+            y = temp_y;
         }
         /// \brief compose self subtraction transform with another and store the result
         /// \param rhs - the first Vector2D to apply
