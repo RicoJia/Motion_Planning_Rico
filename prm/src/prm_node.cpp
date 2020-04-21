@@ -4,13 +4,14 @@
 /// PUBLISHES:
 ///     /visualization_marker_array (visualization_msgs::MarkerArray) map_vis
 
-//#include "prm/PRM.hpp"
 #include "../include/prm/PRM.hpp"
 #include <ros/ros.h>
 #include "visualization_msgs/Marker.h"
 #include "visualization_msgs/MarkerArray.h"
 #include "geometry_msgs/Point.h"
 #include <XmlRpcValue.h>
+
+using namespace PRM_Grid;
 
 /// \brief: populate the marker array message with line_list
 /// \param: vertex_list: all free edges and obstacle edges from a map

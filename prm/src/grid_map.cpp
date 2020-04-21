@@ -5,9 +5,9 @@
 #include "../include/prm/grid_map.hpp"
 using std::cout;
 using std::endl;
+using namespace PRM_Grid;
 
 void GridMap::add_free_vertices(double bounding_r,
-                                 int sample_size,
                                  const std::vector<double>& map_x_lims,
                                  const std::vector<double>& map_y_lims,
                                  double cell_size){

@@ -6,6 +6,8 @@
 #include "../include/prm/grid_map.hpp"
 #include <cmath>
 
+using namespace PRM_Grid;
+
 /// \brief: this function populates a grid_msg with occupancy data
 void populate_grid_msg(nav_msgs::OccupancyGrid& msg, const int height, const int width, const GridMap& grid_map){
     auto grid_map_data = grid_map.get_data();
@@ -43,7 +45,7 @@ int main(int argc, char** argv ){
     double safety_distance = robot_radius + cell_size/sqrt(2);
     GridMap grid_map(grid_msg.info.width, grid_msg.info.height, cell_size);
     grid_map.add_obstacles_and_normal_vecs(obstacle_list, cell_size);
-    grid_map.add_free_vertices(safety_distance, sample_size, map_x_lims, map_y_lims, cell_size);
+    grid_map.add_free_vertices(safety_distance,  map_x_lims, map_y_lims, cell_size);
     grid_map.add_edges_to_N_neighbors(k_nearest,safety_distance);
 
     populate_grid_msg(grid_msg, grid_msg.info.height, grid_msg.info.width, grid_map);

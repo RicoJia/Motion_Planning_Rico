@@ -4,6 +4,7 @@
 #include "../include/prm/map.hpp"
 
 using std::vector;
+using namespace PRM_Grid;
 
 int Map::search(double x, double y){
     for (auto pair:this->vertex_list){
