@@ -17,7 +17,6 @@ Theta_Star::Theta_Star(std::vector<double> start, std::vector<double> goal, XmlR
                        const std::vector<double> &map_y_lims, int k_nearest) :
                        A_Star(start, goal, obstacle_list, cell_size, robot_radius, sample_size, map_x_lims, map_y_lims, k_nearest)
                        {
-
 }
 
 std::vector<PRM_Grid::Vertex> Theta_Star::get_ordered_waypoints(){

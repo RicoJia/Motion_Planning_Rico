@@ -28,11 +28,11 @@ In both algorithms, If start or goal are not reachable, a ROS_Fatal message will
 ### Usage
 To visualize A star path, do 
 ```
-$ global_planning.launch algo_select:=0
+$ roslaunch global_planning_algos global_planning.launch algo_select:=0
 ```
 
 To visualize theta star path, do
 ```
-$ global_planning.launch algo_select:=1
+$ roslaunch global_planning_algos global_planning.launch algo_select:=1
 ```
 

@@ -1,16 +1,21 @@
-//
-// Created by ricojia on 4/19/20.
-//
-
+/// \file
 #include "../include/prm/grid_map.hpp"
+
 using std::cout;
 using std::endl;
 using namespace PRM_Grid;
 
+GridMap::GridMap(int width, int height, double resolution):
+        width(width),
+        height(height),
+        resolution(resolution){
+
+}
+
 void GridMap::add_free_vertices(double bounding_r,
-                                 const std::vector<double>& map_x_lims,
-                                 const std::vector<double>& map_y_lims,
-                                 double cell_size){
+                                const std::vector<double>& map_x_lims,
+                                const std::vector<double>& map_y_lims,
+                                double cell_size){
     for (int y_index = map_y_lims.at(0); y_index < map_y_lims.at(1); ++y_index){
         for (int x_index = map_x_lims.at(0); x_index < map_x_lims.at(1); ++x_index){
             double x = x_index * cell_size + 0.5 * cell_size;
