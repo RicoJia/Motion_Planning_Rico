@@ -25,6 +25,7 @@
 #include <utility>
 #include <XmlRpcValue.h>
 #include <random>
+#include <ros/console.h>
 
 namespace PRM_Grid{
     class PRM{
@@ -42,6 +43,10 @@ namespace PRM_Grid{
 
         /// \brief sample and add free vertices to free_node_map.
         virtual void add_free_vertices(double bounding_r, int sample_size, const std::vector<double>& map_x_lims, const std::vector<double>& map_y_lims, double cell_size);
+
+        /// \brief: add additional free vertices, such as the start and goal of a path. call this function before adding edges. Collision checks will be provided.
+        /// \return: true if successful, false fails collision check.
+        bool add_additional_free_vertices(const std::vector<Vertex>& free_vertices, double bounding_r);
 
         /// \brief: identify K neighbours for each vertex and add edges between them.
         void add_edges_to_N_neighbors(unsigned int K, double bounding_r);
@@ -67,6 +72,16 @@ namespace PRM_Grid{
         /// \return: true if an edge collides with an obstacle, false if not.
         bool if_edge_collide(const Vertex& A, const Vertex& B) const;
 
+        /// \brief: checks if a free vertex with coordinate(x,y) exists.
+        /// \return returns id if the vertex exists, else, returns -1.
+        int search_free_vertex(double x, double y);
+
+        /// \brief: check if an edge between two free vertices is too close to any obstacles
+        /// \param: two free vertices
+        /// \return: true if not close, else false.
+        bool if_edge_too_close_to_obstacle(const Vertex& V1, const Vertex& V2, double bounding_r) const;
+
+
         //----------------------------------Public interface of PRM--------------------------------
     protected:
         /// \brief: private data hiding technique called pimpl idiom.
@@ -87,11 +102,6 @@ namespace PRM_Grid{
         /// \param: vertex P
         /// \return: true if P is too close to an obstacle. Else false.
         bool if_too_close(const Vertex& P, double bounding_r) const;
-
-        /// \brief: check if an edge between two free vertices is too close to any obstacles
-        /// \param: two free vertices
-        /// \return: true if not close, else false.
-        bool if_edge_too_close_to_obstacle(const Vertex& V1, const Vertex& V2, double bounding_r) const;
 
     };
 }

@@ -215,6 +215,25 @@ void PRM::add_free_vertices(double bounding_r, int sample_size, const std::vecto
     }
 }
 
+bool PRM::add_additional_free_vertices(const std::vector<Vertex>& free_vertices, double bounding_r){
+    for (auto vertex: free_vertices){
+        if (!this->if_in_obstacle(vertex)) {
+            if (!this->if_too_close(vertex, bounding_r)) {
+                this->free_node_map.insertVertex(vertex.coord.x, vertex.coord.y);
+            }
+            else{
+                ROS_WARN_STREAM("Invalid Additional Vertex: ("<<vertex.coord.x<<", "<<vertex.coord.y<<")");
+                return false;
+            }
+        }
+        else{
+            ROS_WARN_STREAM("Invalid Additional Vertex: ("<<vertex.coord.x<<", "<<vertex.coord.y<<")");
+            return false;
+        }
+    }
+    return true;
+}
+
 void PRM::add_edges_to_N_neighbors(unsigned int K, double bounding_r){
     auto& vertex_list = this->free_node_map.vertex_list;
     // traversing through all vertex combinations. n*(n-1)/2
@@ -256,4 +275,8 @@ std::unordered_map<int, Vertex> PRM::get_obstacle_vertices_list(){
 
 std::vector< std::vector<int> > PRM::get_obstacle_edges(){
     return this->obstacle_map.get_all_shapes();
+}
+
+int PRM::search_free_vertex(double x, double y){
+    return this->free_node_map.search(x, y);
 }

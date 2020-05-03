@@ -34,5 +34,4 @@ namespace PRM_Grid{
     };
 }
 
-
 #endif //MOTION_PLANNING_CODE_GRID_MAP_H

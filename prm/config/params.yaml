@@ -13,11 +13,23 @@ obstacles: [
   [[30.0,48.0], [22.0,40.0], [32.0,48.0], [30.0,48.0]]
 ]
 
-
 map_x_lims: [0, 34] # x_min, x_max
 map_y_lims: [0, 48] # y_min, y_max
 
 robot_radius: 0.1 # buffer radius for the robot
-k_nearest: 10 # number of neighbors to try and create an edge to
+k_nearest: 12 # number of neighbors to try and create an edge to
 sample_size: 1000 # number of nodes to sample
 cell_size: 0.2  #distance between each cell in meter
+
+#start: [7,3]
+#goal: [7,26]
+
+#start: [20, 45]
+#goal: [31,43]
+
+start: [3,3]
+goal: [3,46]
+
+
+#start: [3,3]
+#goal: [3,7]

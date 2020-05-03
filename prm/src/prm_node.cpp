@@ -2,7 +2,7 @@
 /// \brief: Node that visualizes the PRM roadmap on RViz. Red lines for obstacle boundary, Blue lines for edges, green line_list for free wayline_list.
 /// PARAMETERS:
 /// PUBLISHES:
-///     /visualization_marker_array (visualization_msgs::MarkerArray) map_vis
+///     /map_vis (visualization_msgs::MarkerArray)
 
 #include "../include/prm/PRM.hpp"
 #include <ros/ros.h>
@@ -40,9 +40,11 @@ void populate_edges(const std::unordered_map<int, Vertex> & vertex_list,
         point_list.action = line_list.action = visualization_msgs::Marker::ADD;
         point_list.pose.orientation.w = line_list.pose.orientation.w = 1.0;
         point_list.lifetime = line_list.lifetime = ros::Duration();
+
         point_list.type = visualization_msgs::Marker::POINTS;
         line_list.type = visualization_msgs::Marker::LINE_LIST;
         point_list.scale.x = line_list.scale.x = 0.05;
+
         point_list.scale.y = 0.05;
         line_list.color.b = 1.0f;
         line_list.color.a = 1.0;
@@ -50,6 +52,7 @@ void populate_edges(const std::unordered_map<int, Vertex> & vertex_list,
         point_list.color.a = 1.0;
         point_list.id = id++;
         line_list.id = id++;
+
         point_list.points.push_back(P0);
         point_list.points.push_back(P1);
         line_list.points.push_back(P0);
@@ -116,10 +119,15 @@ int main(int argc, char** argv){
     nh2.getParam("map_y_lims", map_y_lims);
     nh2.getParam("cell_size", cell_size);
 
+    int if_show_edges;
+    nh2.getParam("if_show_edges", if_show_edges);
+
     PRM prm;
     prm.add_obstacles_and_normal_vecs(obstacle_list, cell_size);
-    prm.add_free_vertices(robot_radius, sample_size, map_x_lims, map_y_lims, cell_size);
-    prm.add_edges_to_N_neighbors(k_nearest, robot_radius);
+    if (if_show_edges==1){
+        prm.add_free_vertices(robot_radius, sample_size, map_x_lims, map_y_lims, cell_size);
+        prm.add_edges_to_N_neighbors(k_nearest, robot_radius);
+    }
 
     auto vertex_list = prm.get_free_map_vertices();
     auto edge_list = prm.get_free_edges();

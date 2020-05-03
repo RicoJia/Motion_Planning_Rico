@@ -1,0 +1,12 @@
+<launch>
+    <arg name="algo_select" default='0' doc="0 for Theta_Star, 1 for A star"/>
+
+    <node name="global_planning_node" pkg="global_planning_algos" args="algo_select" type="global_planning_node" output="screen">
+        <rosparam file="$(find prm)/config/params.yaml" command="load"/>
+    </node>
+    <include file="$(find prm)/launch/visualize_prm.launch">
+        <arg name="visualization_mode" value="1"/>
+        <arg name="if_only_rviz" value="0"/>
+        <arg name="if_show_edges" value="0"/>
+    </include>
+</launch>
