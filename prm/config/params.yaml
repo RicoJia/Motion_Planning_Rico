@@ -27,8 +27,8 @@ cell_size: 0.2  #distance between each cell in meter
 #start: [20, 45]
 #goal: [31,43]
 
-start: [3,3]
-goal: [3,46]
+start: [3,3]    #start for global planning
+goal: [3,46]    #goal for global planning
 
 
 #start: [3,3]

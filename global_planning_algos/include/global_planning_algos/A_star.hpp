@@ -69,7 +69,7 @@ namespace global_planning_algos{
 
         /// \brief checks if a node is already goal
         /// \param node - node of interest
-        /// \return true if it's goal, else false
+        /// \return - true if it's goal, else false
         bool is_goal(const A_Star_node& node);
     };
 }
