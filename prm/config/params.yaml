@@ -11,7 +11,7 @@ obstacles: [
   [[6.0,44.0], [2.0,43.0], [2.0,39.0], [6.0,38.0], [8.0,41.0], [6.0,44.0]],
   [[11.0,48.0], [17.0,41.0], [14.0,48.0], [11.0,48.0]],
   [[30.0,48.0], [22.0,40.0], [32.0,48.0], [30.0,48.0]]
-]
+] #obstacles in double, and you should append the starting point at the end to show this is a closed shape
 
 map_x_lims: [0, 34] # x_min, x_max
 map_y_lims: [0, 48] # y_min, y_max
@@ -20,7 +20,7 @@ robot_radius: 0.1 # buffer radius for the robot
 k_nearest: 12 # number of neighbors to try and create an edge to
 sample_size: 1000 # number of nodes to sample
 cell_size: 0.2  #distance between each cell in meter
-
+grid_map_update_rate: 4   #update frequency of grid_map, can also be used for visualizing grid-based planning
 #start: [7,3]
 #goal: [7,26]
 
@@ -33,3 +33,6 @@ goal: [3,46]    #goal for global planning
 
 #start: [3,3]
 #goal: [3,7]
+
+# LPA* and D* Lite
+scan_length: 10     #the view range of the robot is a square (2*scan_length+1) * (2*scan_length+1)

@@ -199,10 +199,11 @@ void PRM::add_obstacles_and_normal_vecs( XmlRpc::XmlRpcValue& obstacle_list, dou
     }
 }
 
-void PRM::add_free_vertices(double bounding_r, int sample_size, const std::vector<double>& map_x_lims, const std::vector<double>& map_y_lims,
+void PRM::add_free_vertices(double bounding_r, int sample_size, const std::vector<int>& map_x_lims, const std::vector<int>& map_y_lims,
                             double cell_size){
     std::uniform_real_distribution<> x_gen(map_x_lims.at(0) * cell_size, map_x_lims.at(1)*cell_size);
     std::uniform_real_distribution<> y_gen(map_y_lims.at(0)* cell_size, map_y_lims.at(1)* cell_size);
+
     for (int i = 0; i<sample_size; ++i){
         double x = x_gen(get_random());
         double y = y_gen(get_random());

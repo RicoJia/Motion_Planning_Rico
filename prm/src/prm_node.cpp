@@ -108,8 +108,8 @@ int main(int argc, char** argv){
     int k_nearest;
     double robot_radius;
     int sample_size;
-    std::vector<double> map_x_lims;
-    std::vector<double> map_y_lims;
+    std::vector<int> map_x_lims;
+    std::vector<int> map_y_lims;
     double cell_size;
     nh2.getParam("obstacles", obstacle_list);
     nh2.getParam("k_nearest", k_nearest);

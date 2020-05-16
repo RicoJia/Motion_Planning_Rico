@@ -42,7 +42,7 @@ namespace PRM_Grid{
         void add_obstacles_and_normal_vecs(XmlRpc::XmlRpcValue& obstacle_list, double coord_multiplier);
 
         /// \brief sample and add free vertices to free_node_map.
-        virtual void add_free_vertices(double bounding_r, int sample_size, const std::vector<double>& map_x_lims, const std::vector<double>& map_y_lims, double cell_size);
+        virtual void add_free_vertices(double bounding_r, int sample_size, const std::vector<int>& map_x_lims, const std::vector<int>& map_y_lims, double cell_size);
 
         /// \brief: add additional free vertices, such as the start and goal of a path. call this function before adding edges. Collision checks will be provided.
         /// \return: true if successful, false fails collision check.

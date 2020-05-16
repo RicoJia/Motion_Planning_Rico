@@ -21,8 +21,8 @@ A_Star::A_Star(std::vector<double>start,
                double cell_size,
                double robot_radius,
                int sample_size,
-               const std::vector<double>& map_x_lims,
-               const std::vector<double>& map_y_lims,
+               const std::vector<int>& map_x_lims,
+               const std::vector<int>& map_y_lims,
                int k_nearest ):
                                 goal_position(goal),
                                 bounding_r(robot_radius)
@@ -50,12 +50,8 @@ std::vector<PRM_Grid::Vertex> A_Star::get_ordered_waypoints(){
     vector<Vertex> ret_waypoints;
     bool path_is_found = false;
 
-    while (1){
-        // check if the open list is empty.
-        if(this->open_list.empty()){
-            path_is_found = false;
-            break;
-        }
+    // if the open list is empty, then no path is found.
+    while (!this->open_list.empty()){
 
         // heapify the Ol according to cost, remove the smallest cost item, set it to the current node
         std::make_heap(this->open_list.begin(), this->open_list.end(),

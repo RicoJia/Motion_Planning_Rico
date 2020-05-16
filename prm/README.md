@@ -29,3 +29,8 @@ To see the grid map, do
 roslaunch prm visualize_prm.launch visualization_mode:=0
 ```
 
+### Additional Information
+- Service
+ ```
+update_grid_map_data (defined in grid_map_node.cpp)
+ ```

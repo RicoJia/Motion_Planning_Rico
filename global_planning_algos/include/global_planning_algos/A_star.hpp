@@ -31,8 +31,8 @@ namespace global_planning_algos{
                 double cell_size,
                 double robot_radius,
                 int sample_size,
-                const std::vector<double>& map_x_lims,
-                const std::vector<double>& map_y_lims,
+                const std::vector<int>& map_x_lims,
+                const std::vector<int>& map_y_lims,
                 int k_nearest
                 );
         virtual ~A_Star();

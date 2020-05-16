@@ -1,18 +1,27 @@
 <launch>
 
-    <arg name="visualization_mode" default='0' doc='0 for grid map, 1 for regular rviz visualization'/>
+    <arg name="visualization_mode" default='0' doc='0 for grid map, 1 for prm'/>
     <arg name="if_only_rviz" default='0' doc='0 for turn on the chosen map node, 1 for turn off the map node '/>
     <arg name="if_show_edges" default='1' doc='0 for showing the obstacles only, 1 for showing the edges too'/>
+    <arg name="use_default_grid" default='1' doc='1 for visualizing the default grid map using data stored in parameter server. 0 for visualizing a custom grid map (you need to use ROS Service /update_grid_map_data to achieve this)'/>
 
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find prm)/config/visualize_prm.rviz" required="true"/>
     <node pkg="tf" type="static_transform_publisher" name="static_map_frame" args="0 0 0 0 0 0 1 map 100" />
 
-    <node name="prm_node" pkg="prm" type="prm_node" output="screen" args="if_show_edges" if="$(eval arg('visualization_mode')==1 and arg('if_only_rviz')==0)">
+<!--    <node name="prm_node" pkg="prm" type="prm_node" output="screen" args="if_show_edges" if="$(eval arg('visualization_mode')==1 and arg('if_only_rviz')==0)">-->
+    <node name="prm_node" pkg="prm" type="prm_node" output="screen" if="$(eval arg('visualization_mode')==1 and arg('if_only_rviz')==0)">
         <rosparam file="$(find prm)/config/params.yaml" command="load"/>
+        <param name="if_show_edges" value="$(arg if_show_edges)"/>
     </node>
 
+<!--    <node name="grid_map_node" pkg="prm" type="grid_map_node" output="screen" args="$(arg use_default_grid)" if="$(eval arg('visualization_mode')==0 and arg('if_only_rviz')==0)">-->
     <node name="grid_map_node" pkg="prm" type="grid_map_node" output="screen" if="$(eval arg('visualization_mode')==0 and arg('if_only_rviz')==0)">
         <rosparam file="$(find prm)/config/params.yaml" command="load"/>
+        <param name="use_default_grid" value="$(arg use_default_grid)"/>
     </node>
 
+    <arg name="map_file" value="$(find prm)/map/grid_world.yaml"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" if="$(eval arg('visualization_mode')==0 and arg('if_only_rviz')==1)">
+        <param name="frame_id" value="map"/>
+    </node>
 </launch>

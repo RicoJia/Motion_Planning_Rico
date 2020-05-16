@@ -61,6 +61,8 @@
   <exec_depend>visualization_msgs</exec_depend>
 
 
+  <exec_depend>prm</exec_depend>
+  <build_depend>prm</build_depend>
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->
