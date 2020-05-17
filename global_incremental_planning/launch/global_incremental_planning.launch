@@ -7,7 +7,7 @@
     </include>
 
     <arg name="algo_select" default="3" doc="3 for LPA*, 4 for D* Lite"/>
-        <node pkg="global_incremental_planning" type="global_incremental_planning_node" name="global_incremental_planning_node" output="screen">
+        <node pkg="global_incremental_planning" type="global_incremental_planning_node" name="global_incremental_planning_node"  output="screen">
         <rosparam file="$(find prm)/config/params.yaml" command="load"/>
         <param name="algo_select" value="$(arg algo_select)"/>
     </node>

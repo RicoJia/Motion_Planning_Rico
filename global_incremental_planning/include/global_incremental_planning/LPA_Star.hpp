@@ -41,16 +41,27 @@ namespace global_incremental_planning{
                  const std::vector<double>& start,
                  const std::vector<double>& goal);
 
+        virtual ~LPA_Star();
+
         //---------------------------Interface Funcs---------------------------
         /// \brief compute the shortest path after map update
         /// \return indices of waypoints in map
-        std::vector<int> get_shortest_path();
+        virtual std::vector<int> get_shortest_path();
 
         /// \brief  handles map updates, updates associated vertex, then compute shortest path. You should call get_shortest_path() after this
         /// to calculate the shortest path
         /// \param changed_nodes_indices - indices of nodes whose occupancy is changed.
         void update_map(const std::vector<int>& changed_nodes_indices);
 
+        /// \brief returns the index of the current robot position, which is search_end_i;
+        int get_current_start_pos();
+
+
+        //TODO move it back
+        /// \brief return the path from the search end point to the search beginning point, by greedily finding the min(g+edge_cost)
+        /// For LPA*, search ends at goal. For D*Lite, search ends at start
+        /// \return {} if no path is found (g_goal = inf), else, indices of all path waypoints including start and goal.
+        std::vector<int> get_path_waypoints() const;
 
     protected:
         PRM_Grid::GridMap const *map_ptr;       //raw pointer to a GridMap object from the outside. raw pointer is used for pointing to stack_allocated objects, because smart pointer cannot acquire ownership.
@@ -82,15 +93,12 @@ namespace global_incremental_planning{
         double get_edge_cost(const int node1_index, const int node2_index) const;
 
 
-        /// \brief return the path from the search end point to the search beginning point, by greedily finding the min(g+edge_cost)
-        /// For LPA*, search ends at goal. For D*Lite, search ends at start
-        /// \return {} if no path is found (g_goal = inf), else, indices of all path waypoints including start and goal.
-        std::vector<int> get_path_waypoints() const;
+
 
 
         //---------------------------Algorithm Funcs---------------------------
         /// \brief update key of a node, based on the current g and rhs
-        void calc_key(LPA_Star_Node& node);
+        virtual void calc_key(LPA_Star_Node& node);
 
         /// \brief return the reference to the first element in the priority queue, then pop it.
         std::reference_wrapper<LPA_Star_Node> pop();

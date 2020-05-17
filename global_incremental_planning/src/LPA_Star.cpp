@@ -7,6 +7,8 @@ using std::vector;
 using std::make_heap;
 using std::pop_heap;
 using std::find_if;
+using std::cout;
+using std::endl;
 
 namespace global_incremental_planning{
 
@@ -19,7 +21,7 @@ namespace global_incremental_planning{
             return key_1.second < key_2.second;
         }
         else{
-            return key_1.first < key_2.first;
+            return key_1.first < key_2.first - 1e-5;
         }
     }
 
@@ -70,9 +72,9 @@ namespace global_incremental_planning{
         this -> map_data.at(this -> search_beginning_i).rhs = 0;
         calc_key(this -> map_data.at(this -> search_beginning_i));
         this -> priority_queue.push_back(this -> map_data.at(this -> search_beginning_i));
-
-        std::cout<<(priority_queue[0]).get().rhs;
     }
+
+    LPA_Star::~LPA_Star(){}
 
 
     //===========================Helper funcs===========================
@@ -87,13 +89,13 @@ namespace global_incremental_planning{
     double LPA_Star::get_heuristics(const int node_index) const{
         vector<double> node_xy = this->map_ptr->get_x_y(node_index);
         vector<double> target_xy = this->map_ptr->get_x_y(this -> search_end_i);
-        double h = rigid2d::distance(rigid2d::Vector2D(node_xy.at(0), node_xy.at(1)),
+        double h = 0.5 * rigid2d::distance(rigid2d::Vector2D(node_xy.at(0), node_xy.at(1)),
                                      rigid2d::Vector2D(target_xy.at(0), target_xy.at(1)));
+        //TODO: h must have 0.5 as a multiplier. otherwise regular euclidean distance wouldn't work. Why??
         return h;
     }
 
     /// \brief return rhs value of node. -1 if node does not exist. 0 for the search_beginning point.
-    //TODO test
     double LPA_Star::get_rhs(const int node_index) const{
 
         if (node_index == this->search_beginning_i){
@@ -101,6 +103,7 @@ namespace global_incremental_planning{
         }
         vector<int>neighbors = this->map_ptr->find_neighbors(node_index, 1);
         if (neighbors.empty()){        //if node_index does not exist
+            ROS_WARN_STREAM("Node index "<<node_index<<"does not exist!");
             return -1;
         }
 
@@ -117,7 +120,6 @@ namespace global_incremental_planning{
     }
 
     /// \brief calculate the true edge cost between two nodes (this is undirectional graph)
-    // TODO test
     double LPA_Star::get_edge_cost(const int node1_index, const int node2_index) const{
 
         if (this->map_data.at(node1_index).is_occupied || this->map_data.at(node2_index).is_occupied){
@@ -126,7 +128,8 @@ namespace global_incremental_planning{
         else{
             vector<double> node1_xy = this->map_ptr->get_x_y(node1_index);
             vector<double> node2_xy = this->map_ptr->get_x_y(node2_index);
-            double edge_cost = std::abs(node1_xy.at(0) - node2_xy.at(0)) + std::abs(node1_xy.at(1) - node2_xy.at(1));
+            double edge_cost = rigid2d::distance(rigid2d::Vector2D(node1_xy.at(0), node1_xy.at(1)),
+                                                 rigid2d::Vector2D(node2_xy.at(0), node2_xy.at(1)));
             return edge_cost;
         }
     }
@@ -142,6 +145,7 @@ namespace global_incremental_planning{
             return path_i_vec; 
         }
         else{                                       //there is a path
+
             path_i_vec.push_back(current_i);    
             do{
                 vector<int>neighbors = this->map_ptr->find_neighbors(current_i, 1);
@@ -152,8 +156,10 @@ namespace global_incremental_planning{
                     double g2 = (this->map_data).at(i2).g;
                     return g1 + edge_cost1 > g2 + edge_cost2;
                 });
+
                 current_i = neighbors.at(0);       //gets the next waypoint's index
                 path_i_vec.push_back(current_i);
+
             }while(current_i != this->search_beginning_i);
 
             return path_i_vec;
@@ -191,7 +197,6 @@ namespace global_incremental_planning{
 
     /// \brief get_rhs for the node, if (g == rhs), remove from U if it's in there; else, update_key, and
     //insert it to priority_queue.
-    //TODO: test
     void LPA_Star::update_vertex(const int node_index){
         LPA_Star_Node& node_ref = this -> map_data.at(node_index);
 
@@ -218,7 +223,6 @@ namespace global_incremental_planning{
 
 
     /// \brief compute the shortest path after map update
-    // TODO: test
     std::vector<int> LPA_Star::get_shortest_path(){
         while( 1 ){
             LPA_Star_Node& search_end_ref = this -> map_data.at(search_end_i);
@@ -231,12 +235,12 @@ namespace global_incremental_planning{
 
             LPA_Star_Node& u_ref = this -> pop();
 
-            // if overconsistent (g==rhs), that means the node has never been expanded, update 8 neighbor vertices
+            // if overconsistent (g>rhs), that means the node has never been expanded, update 8 neighbor vertices
             if(u_ref.g > u_ref.rhs){
                 u_ref.g = u_ref.rhs;
             }
             //if underconsistent (g < rhs), that means there must be cost changes.
-            else{
+            else if(u_ref.g < u_ref.rhs){
                 u_ref.g = numeric_limits<double>::infinity();
                 update_vertex( u_ref.data_index );
             }
@@ -261,9 +265,20 @@ namespace global_incremental_planning{
             // update local map_data
             this->map_data.at(i).is_occupied = true;
             // update associated vertex
+            this->map_data.at(i).rhs = numeric_limits<double>::infinity();  //you need to do this explicityly.
             this->update_vertex(i);
-        }
 
+            // update vertices connected to the occupied cell
+            auto neighbors = this -> map_ptr ->find_neighbors(i, 1);
+            for_each(neighbors.begin(), neighbors.end(),
+                    [&](const int& neighbor_i){this->map_data.at(i).rhs = this->get_rhs(neighbor_i);});
+            for_each(neighbors.begin(), neighbors.end(),
+                     [&](const int& neighbor_i){this -> update_vertex(neighbor_i);});
+        }
+    }
+
+    int LPA_Star::get_current_start_pos() {
+        return this -> search_end_i;
     }
 
 }

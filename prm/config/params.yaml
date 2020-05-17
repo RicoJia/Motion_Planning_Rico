@@ -20,19 +20,23 @@ robot_radius: 0.1 # buffer radius for the robot
 k_nearest: 12 # number of neighbors to try and create an edge to
 sample_size: 1000 # number of nodes to sample
 cell_size: 0.2  #distance between each cell in meter
-grid_map_update_rate: 4   #update frequency of grid_map, can also be used for visualizing grid-based planning
+grid_map_update_rate: 24   #update frequency of grid_map, can also be used for visualizing grid-based planning
 #start: [7,3]
 #goal: [7,26]
 
 #start: [20, 45]
 #goal: [31,43]
 
-start: [3,3]    #start for global planning
+start: [3,3]    #start for global planning, D* star lite will get stuck here with heuristic being euclidean distance
 goal: [3,46]    #goal for global planning
 
+#start: [6, 27]    #start for global planning
+#goal: [3,46]    #goal for global planning
 
-#start: [3,3]
+#start: [3,3]   #no path
 #goal: [3,7]
 
 # LPA* and D* Lite
 scan_length: 10     #the view range of the robot is a square (2*scan_length+1) * (2*scan_length+1)
+sleep_time: 0.5      #the life time of each path
+update_row_num: 1

@@ -156,30 +156,11 @@ int main(int argc, char**argv){
         ROS_INFO_STREAM("LPA_Star is in use");
     }
     else{
-        //TODO
+        planner_ptr = new global_incremental_planning::D_Star_Lite{&robot_map, start, goal};
+        ROS_INFO_STREAM("D* Lite is in use");
     }
 
 
-//    A_Star* planner_ptr;
-//    if (algo_select==0){
-//        planner_ptr = new Theta_Star{start, goal, obstacle_list, cell_size, robot_radius, sample_size, map_x_lims,map_y_lims, k_nearest};
-//        ROS_INFO_STREAM("Theta star algorithm is in use");
-//    }
-//    else{
-//        planner_ptr = new A_Star{start, goal, obstacle_list, cell_size, robot_radius, sample_size, map_x_lims,map_y_lims, k_nearest};
-//        ROS_INFO_STREAM("A star algorithm is in use");
-//    }
-//
-//    auto ordered_waypoints = planner_ptr -> get_ordered_waypoints();
-    //check if there are no waypoints.
-//    if (ordered_waypoints.empty()){
-//        ROS_FATAL_STREAM("NO PATH FOUND");
-//        return 1;
-//    }
-
-//    PRM_Utils::populate_edges(ordered_waypoints, marker_arr);
-
-    // set up service client for calling grid map visualization node
 
     ros::ServiceClient update_grid_srv_client;
     update_grid_srv_client = nh.serviceClient<prm::update_grid_map_data>("update_grid_map_data");
@@ -188,17 +169,21 @@ int main(int argc, char**argv){
 
 
     // loop and map update parameters
-    double sleep_time = 3; //sleep for 2s
-    short int update_row_num = 3;
+    double sleep_time;
+    int update_row_num;
     int scan_length;
+    nh2.getParam("sleep_time", sleep_time);
+    nh2.getParam("update_row_num", update_row_num);
     nh2.getParam("scan_length", scan_length);
     std::vector<int> ordered_waypoints = planner_ptr->get_shortest_path();
 
+    int count = 0;
     while(ros::ok()){
 
         std::vector<int> updated_indices;
         // update map
-        if (algo_select == LPA_Star_Select){      // update the map by rows for LPA star
+        if (algo_select == LPA_Star_Select){
+            // update the map by rows for LPA star
             updated_indices = update_map_by_clns(true_map_data, robot_map, update_row_num, map_x_lims, map_y_lims);
         }
         else if(algo_select == D_Star_Lite_Select){
@@ -206,17 +191,11 @@ int main(int argc, char**argv){
             updated_indices = update_map_by_robot_location(true_map_data, robot_map, data_index, scan_length);
         }
 
-//        //TODO
-//        start.at(0)+=0.5; start.at(1)+=0.5;
-
-        // replan(updated_indices)
-
-        // start = lpa.get_current_pose
-        // ordered_waypoints = find_path()
-
         planner_ptr ->update_map(updated_indices);
         ordered_waypoints = planner_ptr ->get_shortest_path();
-
+        if (algo_select == D_Star_Lite_Select){
+            start = robot_map.get_x_y(planner_ptr -> get_current_start_pos());
+        }
 
         // visualization
 
@@ -229,7 +208,7 @@ int main(int argc, char**argv){
         //Populate end points
         PRM_Utils::populate_end_points(start, goal, "global_incremental_planning", marker_arr, sleep_time);
 
-        //Populate edges TODO
+        //Populate edges
         std::vector<PRM_Grid::Vertex> ordered_waypoint_vertices;
         ordered_waypoint_vertices.reserve(ordered_waypoints.size());    //reserve spots without initialization
 
