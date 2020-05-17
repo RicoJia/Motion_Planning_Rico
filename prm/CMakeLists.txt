@@ -60,8 +60,10 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Generate services in the 'srv' folder
  add_service_files(
+   DIRECTORY
+        srv
    FILES
-        update_grid_map_data.srv
+         update_grid_map_data.srv
  )
 
 ## Generate actions in the 'action' folder
@@ -163,7 +165,8 @@ target_link_libraries(grid_map_node
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencpp)
+add_dependencies(grid_map_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencpp)
 
 ## Specify libraries to link a library or executable target against
 
