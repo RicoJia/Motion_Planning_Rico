@@ -29,6 +29,8 @@ To see the grid map, do
 roslaunch prm visualize_prm.launch visualization_mode:=0
 ```
 
+To change parameters, go to ```prm/config/params.yaml```
+
 ### Additional Information
 - Service
  ```

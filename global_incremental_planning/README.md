@@ -59,3 +59,4 @@ To visualize D* Lite path, do
 $ roslaunch global_planning_algos global_planning.launch algo_select:=4
 ```
 
+To change parameters, go to ```prm/config/params.yaml```
