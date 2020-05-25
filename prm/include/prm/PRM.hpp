@@ -26,6 +26,7 @@
 #include <XmlRpcValue.h>
 #include <random>
 #include <ros/console.h>
+#include <limits>
 
 namespace PRM_Grid{
     class PRM{
@@ -39,6 +40,9 @@ namespace PRM_Grid{
         virtual ~PRM();       //TODO: why do we need explicit default constructor? and do default move and copy assignments simple copy everything to the new obejct?
 
         /// \brief: adding obstacles and outward normal vectors to obstacle_map and normal_vec_list
+        /// obstacle vertices will be stored in
+        /// \param obstacle_list - list of obstacles with integer coordinates
+        /// \param coord_multiplier - cell size
         void add_obstacles_and_normal_vecs(XmlRpc::XmlRpcValue& obstacle_list, double coord_multiplier);
 
         /// \brief sample and add free vertices to free_node_map.
@@ -81,6 +85,16 @@ namespace PRM_Grid{
         /// \return: true if not close, else false.
         bool if_edge_too_close_to_obstacle(const Vertex& V1, const Vertex& V2, double bounding_r) const;
 
+        /// \brief This function is for potential field, which returns the closest point on obstacles to a given robot position
+        /// Each point is found by evaluating the closest points from all edges
+        /// \param V - robot position
+        /// \return -  closest points from all obstacles to the robot position.
+        std::vector<Vertex> get_closest_pts_from_obstacles(const Vertex& V) const;
+
+        /// \brief: check if a vertex is inside an obstacle
+        /// \param: Vertex: a vertex
+        /// \return: false if not in obstacle, true if it is in obstacle.
+        bool if_in_obstacle(const Vertex& P) const;
 
         //----------------------------------Public interface of PRM--------------------------------
     protected:
@@ -90,13 +104,9 @@ namespace PRM_Grid{
         std::vector< std::vector<rigid2d::Vector2D> > normal_vecs_list;     //normal vectors for all obstacle edges
         std::vector< std::vector<int> > obstacles_indices_list; //for closed shapes , it should be like [1,2,3,1].
 
-        Map obstacle_map;          //map that consists of obstacle vertices
-        Map free_node_map;         // map that contains free nodes
+        mutable Map obstacle_map;          //map that consists of obstacle vertices
+        mutable Map free_node_map;         // map that contains free nodes
 
-        /// \brief: check if a vertex is inside an obstacle
-        /// \param: Vertex: a vertex
-        /// \return: false if not in obstacle, true if it is in obstacle.
-        bool if_in_obstacle(const Vertex& P) const;
 
         /// \brief: check if a vertex is too close to an obstacle (within hte bounding radius)
         /// \param: vertex P

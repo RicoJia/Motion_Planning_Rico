@@ -11,6 +11,7 @@ Panels:
         - /MarkerArray1
         - /Map1
         - /MarkerArray2
+        - /MarkerArray3
       Splitter Ratio: 0.5
     Tree Height: 728
   - Class: rviz/Selection
@@ -110,7 +111,7 @@ Visualization Manager:
       Marker Topic: map_vis
       Name: MarkerArray
       Namespaces:
-        {}
+        obstacle_vertices_edges: true
       Queue Size: 100
       Value: true
     - Alpha: 0.699999988079071
@@ -128,7 +129,15 @@ Visualization Manager:
       Marker Topic: global_path
       Name: MarkerArray
       Namespaces:
-        global_incremental_planning: true
+        {}
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: pf_path
+      Name: MarkerArray
+      Namespaces:
+        potential_field: true
       Queue Size: 100
       Value: true
   Enabled: true

@@ -25,15 +25,15 @@ PRM& PRM::operator=(PRM &&) = default;
 PRM::~PRM() = default;
 
 
-//--------------------------------------------helper functions------------------------------------------------------------------
+//--------------------------------------------helper fucntions------------------------------------------------------------------
 /// \brief Create a twister for random sampling
 /// \returns a twister for random sampling
 static std::mt19937 & get_random()
 {
-    // static variables inside a function are created once and persist for the remainder of the program
+    // static variables inside a fucntion are created ocne and persist for the remainder of the program
     static std::random_device rd{};
     static std::mt19937 mt{rd()};
-    // we return a reference to the pseudo-random number genrator object. This is always the
+    // we return a referecne to the pseudo-random number genrator object. This is always the
     // same object every time get_random is called
     return mt;
 }
@@ -162,7 +162,7 @@ bool PRM::if_edge_collide(const Vertex &P1, const Vertex &P0)const {
     return false;
 }
 
-//--------------------------------------------Interface functions------------------------------------------------------------------
+//--------------------------------------------Interface fucntions------------------------------------------------------------------
 
 void PRM::add_obstacles_and_normal_vecs( XmlRpc::XmlRpcValue& obstacle_list, double coord_multiplier) {
 
@@ -181,7 +181,7 @@ void PRM::add_obstacles_and_normal_vecs( XmlRpc::XmlRpcValue& obstacle_list, dou
         this -> obstacles_indices_list.push_back(obstacle_vertices);
     }
 
-    // have to do the following for loop separately since get_all_shapes do not return a sequence that follows all vertices.
+    // have to do the following for loop separately sicne get_all_shapes do not return a sequecne that follows all vertices.
     for(auto& obstacle_indices: obstacles_indices_list){
         int last_vertex_id = -1;
         vector<Vector2D> normal_vecs;
@@ -280,4 +280,63 @@ std::vector< std::vector<int> > PRM::get_obstacle_edges(){
 
 int PRM::search_free_vertex(double x, double y){
     return this->free_node_map.search(x, y);
+}
+
+
+
+std::vector<Vertex> PRM::get_closest_pts_from_obstacles(const Vertex& V) const{
+    vector<Vertex> closest_pts;
+
+    //// have to do the following for loop separately since get_all_shapes do not return a sequecne that follows all vertices.
+    for(auto& obstacle_indices: obstacles_indices_list){
+        int last_vertex_id = -1;
+
+        double min_dist = std::numeric_limits<double>::infinity();      //so you have at least one closest pt.
+        Vertex closest_pt;
+
+        // for each edge
+        for (unsigned int i = 0; i<obstacle_indices.size(); ++i){
+            int vertex_id = obstacle_indices.at(i);
+            //normal vector between the current index and the next index
+            if ( last_vertex_id!= -1){
+                Vertex current_vertex = this -> obstacle_map.vertex_list[vertex_id];
+                Vertex last_vertex = this -> obstacle_map.vertex_list[last_vertex_id];
+
+                Vector2D cl = last_vertex.coord - current_vertex.coord;
+                Vector2D cv = V.coord - current_vertex.coord;
+                double u = cv * cl * (1.0/(length(cl) * length(cl)));
+
+                // choose closet pt if a. u in[0,1] and length is less than min_dist b.the better edge pt is closer than min_dist
+                if (1e-5 <= u && u <= 1.0 + 1e-5){
+                    Vector2D oc{current_vertex.coord.x, current_vertex.coord.y};
+                    Vector2D op = oc + u * cl;
+                    Vector2D vp = -1.0 * cv + (-1.0) * oc + op;
+                    Vertex p{op.x, op.y};
+                    if(length(vp) < min_dist){
+                        closest_pt = p;
+                        min_dist = length(vp);
+                    }
+                }
+                else{
+                    // get the vector from v to the closer edge point, which is decided between |vn| and |vc|
+                    Vector2D v_edge_pt_vec = std::min(-1.0 * cv + cl,-1.0 * cv,
+                                                      [&](const Vector2D& a, const Vector2D& b){return length(a) < length(b);});
+
+                    if(length(v_edge_pt_vec) < min_dist){
+                        //get the closer edge point
+                        Vector2D o_edge_pt = {V.coord.x, V.coord.y};
+                        o_edge_pt += v_edge_pt_vec;
+                        Vertex edge_pt {o_edge_pt.x, o_edge_pt.y};
+
+                        closest_pt = edge_pt;
+                        min_dist = length(v_edge_pt_vec);
+
+                    }
+                }
+            }
+            last_vertex_id = vertex_id;
+        }
+        closest_pts.push_back(closest_pt);
+    }
+    return closest_pts;
 }

@@ -10,6 +10,7 @@
 #include <functional>
 #include <cmath>
 #include <algorithm>
+#include <stdexcept>
 
 namespace global_incremental_planning{
 

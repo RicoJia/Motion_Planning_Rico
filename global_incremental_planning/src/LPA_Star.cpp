@@ -140,9 +140,10 @@ namespace global_incremental_planning{
         vector<int> path_i_vec;
         int current_i = this -> search_end_i;
 
-        if (isinf(this->map_data.at(current_i).g)){ // if no path is found
-            ROS_WARN("No path is found!"); 
-            return path_i_vec; 
+        if (isinf(this->map_data.at(current_i).g)){ // if no path is found, throws an error.
+            ROS_WARN("No path is found!");
+            throw (std::runtime_error("No Path is found. The global planning node has quitted"));
+//            return path_i_vec;
         }
         else{                                       //there is a path
 

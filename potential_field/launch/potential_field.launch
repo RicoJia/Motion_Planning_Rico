@@ -1,0 +1,13 @@
+<launch>
+    <arg name="algo_select" default='0' doc="0 for Continuous Potential Field, 1 for Bushfire Algorithm, 2 for wavefront planner"/>
+
+    <node name="pf_node" pkg="potential_field" args="algo_select" type="pf_node" output="screen">
+        <rosparam file="$(find prm)/config/params.yaml" command="load"/>
+    </node>
+
+    <include file="$(find prm)/launch/visualize_prm.launch">
+        <arg name="visualization_mode" value="1"/>
+        <arg name="if_only_rviz" value="0"/>
+        <arg name="if_show_edges" value="0"/>
+    </include>
+</launch>

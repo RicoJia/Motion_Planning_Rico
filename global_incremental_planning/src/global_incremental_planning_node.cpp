@@ -177,50 +177,60 @@ int main(int argc, char**argv){
     nh2.getParam("scan_length", scan_length);
     std::vector<int> ordered_waypoints = planner_ptr->get_shortest_path();
 
-    int count = 0;
+
+
     while(ros::ok()){
 
-        std::vector<int> updated_indices;
-        // update map
-        if (algo_select == LPA_Star_Select){
-            // update the map by rows for LPA star
-            updated_indices = update_map_by_clns(true_map_data, robot_map, update_row_num, map_x_lims, map_y_lims);
+        try{
+            ordered_waypoints = planner_ptr ->get_shortest_path();
+
+            if (algo_select == D_Star_Lite_Select){
+                start = robot_map.get_x_y(planner_ptr -> get_current_start_pos());
+            }
+
+            // visualization
+            //update grid map
+            srv_msg.request.grid_map_data = robot_map.get_data();     //show the updated robot map
+            update_grid_srv_client.call(srv_msg);       //call the grid map visualization node about the update
+
+            visualization_msgs::MarkerArray marker_arr;
+
+            //Populate end points
+            PRM_Utils::populate_end_points(start, goal, "global_incremental_planning", marker_arr, sleep_time);
+
+            //Populate edges
+            std::vector<PRM_Grid::Vertex> ordered_waypoint_vertices;
+            ordered_waypoint_vertices.reserve(ordered_waypoints.size());    //reserve spots without initialization
+
+            std::for_each(ordered_waypoints.cbegin(), ordered_waypoints.cend(),
+                          [&](const int i){auto xy = robot_map.get_x_y(i);
+                              ordered_waypoint_vertices.push_back(PRM_Grid::Vertex(xy.at(0), xy.at(1))); });
+            PRM_Utils::populate_edges(ordered_waypoint_vertices, marker_arr, "global_incremental_planning", sleep_time);
+            marker_pub.publish(marker_arr);     //mark the start and the goal of the robot.
+
+
+            //update map
+            std::vector<int> updated_indices;
+            int data_index;
+            if (algo_select == LPA_Star_Select){
+                // update the map by rows for LPA star
+                updated_indices = update_map_by_clns(true_map_data, robot_map, update_row_num, map_x_lims, map_y_lims);
+            }
+
+            else if(algo_select == D_Star_Lite_Select){
+                data_index = robot_map.get_index_in_data_array(start.at(0), start.at(1));
+                updated_indices = update_map_by_robot_location(true_map_data, robot_map, data_index, scan_length);
+            }
+            planner_ptr ->update_map(updated_indices);
+            ros::spinOnce();
+            ros::Duration(sleep_time).sleep();
         }
-        else if(algo_select == D_Star_Lite_Select){
-            int data_index = robot_map.get_index_in_data_array(start.at(0), start.at(1));
-            updated_indices = update_map_by_robot_location(true_map_data, robot_map, data_index, scan_length);
+
+        // catch exception for not finding a path. then break from while loop
+        catch(std::exception& e){
+            std::cerr<<e.what();
+            break;
         }
-
-        planner_ptr ->update_map(updated_indices);
-        ordered_waypoints = planner_ptr ->get_shortest_path();
-        if (algo_select == D_Star_Lite_Select){
-            start = robot_map.get_x_y(planner_ptr -> get_current_start_pos());
-        }
-
-        // visualization
-
-        //update grid map
-        srv_msg.request.grid_map_data = robot_map.get_data();     //show the updated robot map
-        update_grid_srv_client.call(srv_msg);       //call the grid map visualization node about the update
-
-        visualization_msgs::MarkerArray marker_arr;
-
-        //Populate end points
-        PRM_Utils::populate_end_points(start, goal, "global_incremental_planning", marker_arr, sleep_time);
-
-        //Populate edges
-        std::vector<PRM_Grid::Vertex> ordered_waypoint_vertices;
-        ordered_waypoint_vertices.reserve(ordered_waypoints.size());    //reserve spots without initialization
-
-        std::for_each(ordered_waypoints.cbegin(), ordered_waypoints.cend(),
-                [&](const int i){auto xy = robot_map.get_x_y(i);
-                                 ordered_waypoint_vertices.push_back(PRM_Grid::Vertex(xy.at(0), xy.at(1))); });
-        PRM_Utils::populate_edges(ordered_waypoint_vertices, marker_arr, "global_incremental_planning", sleep_time);
-        marker_pub.publish(marker_arr);     //mark the start and the goal of the robot.
-
-
-        ros::spinOnce();
-        ros::Duration(sleep_time).sleep();
     }
 
     return 0;
