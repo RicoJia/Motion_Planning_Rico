@@ -14,6 +14,7 @@ If the robot is not too close to obstacles, we have something like
  <img src="../media/PF_normal.gif" alt="Kitten" title="A cute kitten" width="400" />
  
  However, if local minimas occur, we must use local minima escape PF. 
+ <img src="../media/PF_stuck.gif" alt="Kitten" title="A cute kitten" width="400" />
  
 ###### Implementation notes
 When the goal is reached, the node will stop and signal the success of reaching the goal. 
