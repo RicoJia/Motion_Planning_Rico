@@ -26,7 +26,7 @@ However, oscillations will occur around local minima, as a result of the 'tug of
 In the future, non-sticking mechanism should be added.
  
 ### Usage
-To visualize LPA* path, do 
+To visualize Potential Field path, do 
 ```
 $ roslaunch potential_field potential_field.launch
 ```
