@@ -109,7 +109,35 @@ namespace PRM_Utils{
             line_list.points.push_back(P1);
             marker_array.markers.push_back(point_list);
             marker_array.markers.push_back(line_list);
+        }
+    }
 
+    /// \brief: populate the marker array message with point list. Only path vertices are populated here.
+    void populate_points(const std::vector<PRM_Grid::Vertex> free_waypoints,
+                        visualization_msgs::MarkerArray& marker_array,
+                        std::string name_space,
+                        double life_time)
+    {
+        if (free_waypoints.empty()){
+            ROS_WARN("Utils: Empty point list");
+            return;
+        }
+        for (unsigned int i = 0; i < free_waypoints.size(); ++i){
+            geometry_msgs::Point P0;
+            populate_point_xy(P0, free_waypoints.at(i).coord.x, free_waypoints.at(i).coord.y);
+
+            visualization_msgs::Marker point_list;
+            populate_geometric_primitive_list_basics(point_list, name_space, life_time);
+
+            point_list.type = visualization_msgs::Marker::POINTS;
+
+            point_list.scale.x = 0.05;
+            point_list.scale.y = 0.05;
+
+            populate_geometric_primitive_list_color(point_list, 0.01, 0.8, 0.125);        //light green for path vertices
+            point_list.id = get_id();
+            point_list.points.push_back(P0);
+            marker_array.markers.push_back(point_list);
         }
     }
 };

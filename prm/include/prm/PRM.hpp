@@ -29,6 +29,16 @@
 #include <limits>
 
 namespace PRM_Grid{
+
+    /// \brief calculate the shortest distance and the vertex on an edge, to a point V that's not on the edge.
+    /// \param V: a point not on the edge
+    /// \param edge_v1: one end point of an edge
+    /// \param edge_v2: one end point of another edge
+    /// \param dist: variable for storing the updated distance value. Should not be lvalue!!
+    /// \return point on the edge that's closest to the point.
+    Vertex get_closest_pt_and_dist_to_edge(const Vertex& V, const Vertex& edge_V1, const Vertex& edge_V2, double& dist);
+
+
     class PRM{
     public:
         PRM();

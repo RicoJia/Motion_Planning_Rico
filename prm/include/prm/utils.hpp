@@ -55,6 +55,25 @@ namespace PRM_Utils {
                         visualization_msgs::MarkerArray& marker_array,
                         std::string name_space,
                         double life_time);
+
+    /// \brief: populate the marker array message with points.
+    /// \param free_waypoints - waypoints to be visualized
+    /// \param marker_array - marker_array object to be populated
+    /// \param name_space name space of the marker array object
+    /// \param life_time life time of the marker objects
+    void populate_edges(const std::vector<PRM_Grid::Vertex> free_waypoints,
+                        visualization_msgs::MarkerArray& marker_array,
+                        std::string name_space,
+                        double life_time);
+
+
+    /// \brief: populate the marker array message with point list. Only path vertices are populated here.
+    /// \param free_waypoints - waypoints to be visualized
+    /// \param marker_array - marker_array object to be populated
+    void populate_points(const std::vector<PRM_Grid::Vertex> free_waypoints,
+                         visualization_msgs::MarkerArray& marker_array,
+                         std::string name_space,
+                         double life_time);
 }
 
 #endif //MOTION_PLANNING_RICO_UTILS_H

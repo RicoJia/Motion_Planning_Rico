@@ -55,7 +55,14 @@ namespace potential_field{
         /// finding the their closest points to current_pos, and calculating the correspoding .
         /// Then, return the sum of all gradients
         /// \return repulsive field gradient
-        rigid2d::Vector2D get_rep_gradient() const;
+        rigid2d::Vector2D get_rep_gradient() const;/// \file
+/// \brief Library for two-dimensional rigid body transformations.
+
+#include <iosfwd> // contains forward definitions for iostream objects
+#include <iostream>
+#include <Eigen/Dense>
+#include <math.h>       /* cos */
+
 
         /// \brief check if current robot position is within m_epsilon dist from the goal
         bool has_reached_goal() const;

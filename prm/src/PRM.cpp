@@ -38,6 +38,36 @@ static std::mt19937 & get_random()
     return mt;
 }
 
+
+Vertex get_closest_pt_and_dist_to_edge(const Vertex& V, const Vertex& edge_V1, const Vertex& edge_V2, double& dist){
+
+    Vector2D cl = edge_V1.coord - edge_V2.coord;
+    Vector2D cv = V.coord - edge_V2.coord;
+    double u = cv * cl * (1.0/(length(cl) * length(cl)));
+
+    // choose closet pt if a. u in[0,1] and length is less than min_dist b.the better edge pt is closer than min_dist
+    if (1e-5 <= u && u <= 1.0 + 1e-5){
+        Vector2D oc{edge_V2.coord.x, edge_V2.coord.y};
+        Vector2D op = oc + u * cl;
+        Vector2D vp = -1.0 * cv + (-1.0) * oc + op;
+        Vertex p{op.x, op.y};
+        dist = length(vp);
+        return p;
+    }
+    else{
+        // get the vector from v to the closer edge point, which is decided between |vn| and |vc|
+        Vector2D v_edge_pt_vec = std::min(-1.0 * cv + cl,-1.0 * cv,
+                                          [&](const Vector2D& a, const Vector2D& b){return length(a) < length(b);});
+        //get the closer edge point
+        Vector2D o_edge_pt = {V.coord.x, V.coord.y};
+        o_edge_pt += v_edge_pt_vec;
+        Vertex edge_pt {o_edge_pt.x, o_edge_pt.y};
+        dist = length(v_edge_pt_vec);
+        return edge_pt;
+    }
+}
+
+
 bool PRM::if_in_obstacle(const Vertex& P) const {
 
     for (unsigned int j = 0; j < this->obstacles_indices_list.size(); ++j){
@@ -283,7 +313,6 @@ int PRM::search_free_vertex(double x, double y){
 }
 
 
-
 std::vector<Vertex> PRM::get_closest_pts_from_obstacles(const Vertex& V) const{
     vector<Vertex> closest_pts;
 
@@ -301,37 +330,12 @@ std::vector<Vertex> PRM::get_closest_pts_from_obstacles(const Vertex& V) const{
             if ( last_vertex_id!= -1){
                 Vertex current_vertex = this -> obstacle_map.vertex_list[vertex_id];
                 Vertex last_vertex = this -> obstacle_map.vertex_list[last_vertex_id];
+                double dist;
+                Vertex closest_edge_pt = ::get_closest_pt_and_dist_to_edge(V, current_vertex, last_vertex, dist);
 
-                Vector2D cl = last_vertex.coord - current_vertex.coord;
-                Vector2D cv = V.coord - current_vertex.coord;
-                double u = cv * cl * (1.0/(length(cl) * length(cl)));
-
-                // choose closet pt if a. u in[0,1] and length is less than min_dist b.the better edge pt is closer than min_dist
-                if (1e-5 <= u && u <= 1.0 + 1e-5){
-                    Vector2D oc{current_vertex.coord.x, current_vertex.coord.y};
-                    Vector2D op = oc + u * cl;
-                    Vector2D vp = -1.0 * cv + (-1.0) * oc + op;
-                    Vertex p{op.x, op.y};
-                    if(length(vp) < min_dist){
-                        closest_pt = p;
-                        min_dist = length(vp);
-                    }
-                }
-                else{
-                    // get the vector from v to the closer edge point, which is decided between |vn| and |vc|
-                    Vector2D v_edge_pt_vec = std::min(-1.0 * cv + cl,-1.0 * cv,
-                                                      [&](const Vector2D& a, const Vector2D& b){return length(a) < length(b);});
-
-                    if(length(v_edge_pt_vec) < min_dist){
-                        //get the closer edge point
-                        Vector2D o_edge_pt = {V.coord.x, V.coord.y};
-                        o_edge_pt += v_edge_pt_vec;
-                        Vertex edge_pt {o_edge_pt.x, o_edge_pt.y};
-
-                        closest_pt = edge_pt;
-                        min_dist = length(v_edge_pt_vec);
-
-                    }
+                if(dist < min_dist){
+                    min_dist = dist;
+                    closest_pt = closest_edge_pt;
                 }
             }
             last_vertex_id = vertex_id;
